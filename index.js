@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const main = require('./db');
+const db = require('./db');
 const app = express();
 
 //parse requests with JSON payloads
@@ -17,7 +17,7 @@ app.post('/subscribe', async (req, res) => {
     }
 
     try {
-        const sendDBResult = await main(req.body);
+        const sendDBResult = await db.saveUser(req.body);
         if(sendDBResult === 0) {
             res.status(201).send('Subscription details successfully saved to DB');
         }
@@ -25,8 +25,29 @@ app.post('/subscribe', async (req, res) => {
         console.error(e);
         res.status(500).send('Error passing request to DB');
         return;
+    }  
+})
+
+app.get('/allusers', async(req, res) => {
+    try {
+        const userList = await db.getAllUsers();
+        res.status(200).json( { msg: "Successfully got'em", userList});
+    } catch(e) {
+        console.error(e);
+        res.status(500).send('Error getting all users');
+        return;
     }
-    
+})
+
+app.get('/mine', async(req, res) => {
+    try {
+        const mySub = await db.getMine();
+        res.status(200).json( { msg: "Successfully got mine", mySub });
+    } catch(e) {
+        console.error(e);
+        res.status(500).send('Error getting');
+        return;
+    }
 })
 
 //define a route that listens to requests
